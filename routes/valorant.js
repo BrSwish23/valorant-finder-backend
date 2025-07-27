@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const fetch = require('node-fetch');
 
 console.log('🚀 Loading Valorant routes...');
 
@@ -8,6 +9,11 @@ const VALORANT_API_BASE = 'https://api.henrikdev.xyz/valorant/v2';
 const VALORANT_API_KEY = process.env.VALORANT_API_KEY;
 
 console.log('🔑 API Key configured:', VALORANT_API_KEY ? 'Yes' : 'No');
+
+// Simple test route
+router.get('/ping', (req, res) => {
+  res.json({ message: 'Valorant routes are working!', timestamp: new Date().toISOString() });
+});
 
 // Helper functions for data extraction
 const extractProfileImageUrl = (apiData) => {
