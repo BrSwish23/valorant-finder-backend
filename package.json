@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Backend API for Valorant Team Finder",
   "main": "server.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "echo 'No build needed'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -24,11 +24,12 @@
     "npm": ">=8.0.0"
   },
   "keywords": [
+    "node",
+    "express",
+    "backend",
+    "api",
     "valorant",
     "gaming",
-    "api",
-    "backend",
-    "express",
     "rest-api"
   ],
   "author": "Your Name",
