@@ -27,7 +27,18 @@ app.use((req, res, next) => {
 });
 
 // Import routes
-const valorantRoutes = require('./routes/valorant');
+let valorantRoutes;
+try {
+  valorantRoutes = require('./routes/valorant');
+  console.log('✅ Valorant routes loaded successfully');
+} catch (error) {
+  console.error('❌ Error loading valorant routes:', error);
+  // Create a fallback router
+  valorantRoutes = require('express').Router();
+  valorantRoutes.get('/error', (req, res) => {
+    res.json({ error: 'Routes failed to load', details: error.message });
+  });
+}
 
 // Debug logging
 console.log('🔍 Loading routes...');
