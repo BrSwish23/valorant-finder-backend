@@ -13,21 +13,13 @@ console.log('🔑 API Key configured:', VALORANT_API_KEY ? 'Yes' : 'No');
 // Helper functions for data extraction
 const extractProfileImageUrl = (apiData) => {
   try {
-    const imagePaths = [
-      apiData?.card?.small,
-      apiData?.card?.large,
-      apiData?.current_data?.images?.small,
-      apiData?.current_data?.images?.large,
-      apiData?.images?.small,
-      apiData?.images?.large
-    ];
-    
-    for (const path of imagePaths) {
-      if (path && typeof path === 'string' && path.startsWith('http')) {
-        return path;
-      }
+    // The API response has images in current_data.images
+    if (apiData?.data?.current_data?.images?.large) {
+      return apiData.data.current_data.images.large;
     }
-    
+    if (apiData?.data?.current_data?.images?.small) {
+      return apiData.data.current_data.images.small;
+    }
     return null;
   } catch (error) {
     console.error('Error extracting profile image URL:', error);
@@ -37,11 +29,9 @@ const extractProfileImageUrl = (apiData) => {
 
 const extractRankFromApiData = (apiData) => {
   try {
-    if (apiData?.current_data?.currenttierpatched) {
-      return apiData.current_data.currenttierpatched;
-    }
-    if (apiData?.currenttierpatched) {
-      return apiData.currenttierpatched;
+    // The API response has currenttierpatched in data.current_data
+    if (apiData?.data?.current_data?.currenttierpatched) {
+      return apiData.data.current_data.currenttierpatched;
     }
     return null;
   } catch (error) {
@@ -55,11 +45,18 @@ const extractLifetimeStatsFromMmr = (apiData) => {
     let totalWins = 0;
     let totalGames = 0;
 
-    if (apiData?.by_season && typeof apiData.by_season === 'object') {
+    // The API response has by_season in data.by_season
+    if (apiData?.data?.by_season && typeof apiData.data.by_season === 'object') {
       console.log('Found by_season data, calculating lifetime stats...');
       
-      Object.keys(apiData.by_season).forEach(seasonKey => {
-        const seasonData = apiData.by_season[seasonKey];
+      Object.keys(apiData.data.by_season).forEach(seasonKey => {
+        const seasonData = apiData.data.by_season[seasonKey];
+        
+        // Skip seasons with errors
+        if (seasonData?.error) {
+          console.log(`Season ${seasonKey}: ${seasonData.error}`);
+          return;
+        }
         
         if (seasonData && typeof seasonData === 'object') {
           const wins = parseInt(seasonData.wins) || 0;
@@ -140,6 +137,7 @@ router.post('/validate-profile', async (req, res) => {
 
     const apiData = await apiResponse.json();
     console.log('✅ API call successful');
+    console.log('📊 Raw API response:', JSON.stringify(apiData, null, 2));
 
     // Process the data
     const lifetimeStats = extractLifetimeStatsFromMmr(apiData);
