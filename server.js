@@ -54,6 +54,11 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'API routing is working!', timestamp: new Date().toISOString() });
 });
 
+// Simple test route before valorant routes
+app.get('/api/simple', (req, res) => {
+  res.json({ message: 'Simple API route works!', timestamp: new Date().toISOString() });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
