@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
+console.log('🚀 Loading Valorant routes...');
+
 // Valorant API configuration
 const VALORANT_API_BASE = 'https://api.henrikdev.xyz/valorant/v2';
 const VALORANT_API_KEY = process.env.VALORANT_API_KEY;
+
+console.log('🔑 API Key configured:', VALORANT_API_KEY ? 'Yes' : 'No');
 
 // Helper functions for data extraction
 const extractProfileImageUrl = (apiData) => {

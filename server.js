@@ -29,8 +29,19 @@ app.use((req, res, next) => {
 // Import routes
 const valorantRoutes = require('./routes/valorant');
 
+// Debug logging
+console.log('🔍 Loading routes...');
+console.log('📁 Routes directory exists:', require('fs').existsSync('./routes'));
+console.log('📄 Valorant routes file exists:', require('fs').existsSync('./routes/valorant.js'));
+
 // Routes
 app.use('/api/valorant', valorantRoutes);
+console.log('✅ Valorant routes loaded at /api/valorant');
+
+// Test route to verify routing
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API routing is working!', timestamp: new Date().toISOString() });
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
