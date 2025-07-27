@@ -15,6 +15,16 @@ router.get('/ping', (req, res) => {
   res.json({ message: 'Valorant routes are working!', timestamp: new Date().toISOString() });
 });
 
+// Simple POST test route
+router.post('/test-post', (req, res) => {
+  console.log('📝 POST test route hit');
+  res.json({ 
+    message: 'POST route is working!', 
+    body: req.body,
+    timestamp: new Date().toISOString() 
+  });
+});
+
 // Helper functions for data extraction
 const extractProfileImageUrl = (apiData) => {
   try {
@@ -88,6 +98,9 @@ const extractLifetimeStatsFromMmr = (apiData) => {
 
 // POST /api/valorant/validate-profile
 router.post('/validate-profile', async (req, res) => {
+  console.log('🎯 Validate-profile route hit');
+  console.log('📝 Request body:', req.body);
+  
   try {
     const { valorantName, valorantTag } = req.body;
 
