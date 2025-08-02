@@ -20,9 +20,11 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Logging middleware
+// Logging middleware - only in development
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  }
   next();
 });
 
@@ -30,7 +32,9 @@ app.use((req, res, next) => {
 let valorantRoutes;
 try {
   valorantRoutes = require('./routes/valorant');
-  console.log('✅ Valorant routes loaded successfully');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('✅ Valorant routes loaded successfully');
+  }
 } catch (error) {
   console.error('❌ Error loading valorant routes:', error);
   // Create a fallback router
@@ -55,14 +59,18 @@ try {
   });
 }
 
-// Debug logging
-console.log('🔍 Loading routes...');
-console.log('📁 Routes directory exists:', require('fs').existsSync('./routes'));
-console.log('📄 Valorant routes file exists:', require('fs').existsSync('./routes/valorant.js'));
+// Debug logging - only in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔍 Loading routes...');
+  console.log('📁 Routes directory exists:', require('fs').existsSync('./routes'));
+  console.log('📄 Valorant routes file exists:', require('fs').existsSync('./routes/valorant.js'));
+}
 
 // Routes
 app.use('/api/valorant', valorantRoutes);
-console.log('✅ Valorant routes loaded at /api/valorant');
+if (process.env.NODE_ENV === 'development') {
+  console.log('✅ Valorant routes loaded at /api/valorant');
+}
 
 // Test route to verify routing
 app.get('/api/test', (req, res) => {
@@ -115,7 +123,9 @@ app.use((error, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Valorant Finder Backend running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`🚀 Valorant Finder Backend running on port ${PORT}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  }
 }); 

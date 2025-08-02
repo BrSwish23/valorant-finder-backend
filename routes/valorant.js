@@ -2,13 +2,18 @@ const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
 
-console.log('🚀 Loading Valorant routes...');
+// Development-only logging
+if (process.env.NODE_ENV === 'development') {
+  console.log('🚀 Loading Valorant routes...');
+}
 
 // Valorant API configuration
 const VALORANT_API_BASE = 'https://api.henrikdev.xyz/valorant/v2';
 const VALORANT_API_KEY = process.env.VALORANT_API_KEY;
 
-console.log('🔑 API Key configured:', VALORANT_API_KEY ? 'Yes' : 'No');
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔑 API Key configured:', VALORANT_API_KEY ? 'Yes' : 'No');
+}
 
 // Helper functions for data extraction
 const extractProfileImageUrl = (apiData) => {
@@ -22,7 +27,9 @@ const extractProfileImageUrl = (apiData) => {
     }
     return null;
   } catch (error) {
-    console.error('Error extracting profile image URL:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error extracting profile image URL:', error);
+    }
     return null;
   }
 };
@@ -35,7 +42,9 @@ const extractRankFromApiData = (apiData) => {
     }
     return null;
   } catch (error) {
-    console.error('Error extracting rank from API data:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error extracting rank from API data:', error);
+    }
     return null;
   }
 };
@@ -47,14 +56,18 @@ const extractLifetimeStatsFromMmr = (apiData) => {
 
     // The API response has by_season in data.by_season
     if (apiData?.data?.by_season && typeof apiData.data.by_season === 'object') {
-      console.log('Found by_season data, calculating lifetime stats...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Found by_season data, calculating lifetime stats...');
+      }
       
       Object.keys(apiData.data.by_season).forEach(seasonKey => {
         const seasonData = apiData.data.by_season[seasonKey];
         
         // Skip seasons with errors
         if (seasonData?.error) {
-          console.log(`Season ${seasonKey}: ${seasonData.error}`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Season ${seasonKey}: ${seasonData.error}`);
+          }
           return;
         }
         
@@ -65,15 +78,21 @@ const extractLifetimeStatsFromMmr = (apiData) => {
           totalWins += wins;
           totalGames += games;
           
-          console.log(`Season ${seasonKey}: ${wins} wins out of ${games} games`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Season ${seasonKey}: ${wins} wins out of ${games} games`);
+          }
         }
       });
     }
 
-    console.log(`Total lifetime stats: ${totalWins} wins out of ${totalGames} games`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Total lifetime stats: ${totalWins} wins out of ${totalGames} games`);
+    }
     return { lifetimeWins: totalWins, lifetimeGamesPlayed: totalGames };
   } catch (error) {
-    console.error('Error extracting lifetime stats from MMR data:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error extracting lifetime stats from MMR data:', error);
+    }
     return { lifetimeWins: 0, lifetimeGamesPlayed: 0 };
   }
 };
@@ -85,8 +104,10 @@ router.get('/ping', (req, res) => {
 
 // Complete validate-profile route with real API integration
 router.post('/validate-profile', async (req, res) => {
-  console.log('🎯 Validate-profile route hit');
-  console.log('📝 Request body:', req.body);
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🎯 Validate-profile route hit');
+    console.log('📝 Request body:', req.body);
+  }
   
   try {
     const { valorantName, valorantTag } = req.body;
@@ -108,7 +129,9 @@ router.post('/validate-profile', async (req, res) => {
       });
     }
 
-    console.log(`🚀 Validating profile: ${valorantName}#${valorantTag}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🚀 Validating profile: ${valorantName}#${valorantTag}`);
+    }
 
     // Make API call to Valorant API
     const apiUrl = `${VALORANT_API_BASE}/mmr/AP/${encodeURIComponent(valorantName)}/${encodeURIComponent(valorantTag)}`;
@@ -136,8 +159,10 @@ router.post('/validate-profile', async (req, res) => {
     }
 
     const apiData = await apiResponse.json();
-    console.log('✅ API call successful');
-    console.log('📊 Raw API response:', JSON.stringify(apiData, null, 2));
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ API call successful');
+      console.log('📊 Raw API response:', JSON.stringify(apiData, null, 2));
+    }
 
     // Process the data
     const lifetimeStats = extractLifetimeStatsFromMmr(apiData);
@@ -148,7 +173,9 @@ router.post('/validate-profile', async (req, res) => {
       lifetimeGamesPlayed: lifetimeStats.lifetimeGamesPlayed
     };
 
-    console.log('📊 Processed data:', processedData);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Processed data:', processedData);
+    }
 
     res.status(200).json({
       success: true,
@@ -156,7 +183,9 @@ router.post('/validate-profile', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Profile validation error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ Profile validation error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Internal server error'
